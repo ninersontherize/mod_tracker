@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 #config
@@ -51,12 +51,23 @@ MODS = [
     }
 ]
 
-@app.route('/mods', methods=['GET'])
+@app.route('/mods', methods=['GET', 'POST'])
 def all_mods():
-    return jsonify({
-        'status': 'success',
-        'mods': MODS
-    })
+    response_object = {'status': 'success'}
+    if request.method == 'POST':
+        post_data = request.get_json()
+        MODS.append({
+            'section': post_data.get('section'),
+            'author': post_data.get('part_name'),
+            'link': post_data.get('link'),
+            'price': post_data.get('price'),
+            'purchased': post_data.get('purchased'),
+            'installed': post_data.get('installed')
+        })
+        response_object['message'] = 'Mod added!'
+    else:
+        response_object['mods'] = MODS
+    return jsonify(response_object)
 
 if __name__ == '__main__':
     app.run()
